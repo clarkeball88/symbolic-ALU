@@ -1,1 +1,22 @@
-// Symbolic-to-binary encoder placeholder
+# encoder.py
+from macro_library import MACROS, expand_macros
+from utils import symbolic_to_binary_digit
+
+class SymbolicEncoder:
+    def __init__(self, macros=MACROS):
+        self.macros = macros
+
+    def encode_symbolic_number(self, symbolic_number):
+        """
+        Encodes a symbolic number (list of symbolic digits) into a binary string.
+        """
+        expanded = expand_macros(symbolic_number, self.macros)
+        binary_output = ''.join(symbolic_to_binary_digit(d) for d in expanded)
+        return binary_output
+
+    def encode_symbolic_program(self, symbolic_program):
+        """
+        Encodes a symbolic program (list of symbolic instructions) into binary.
+        Each instruction is a symbolic number or macro.
+        """
+        return [self.encode_symbolic_number(instruction) for instruction in symbolic_program]
