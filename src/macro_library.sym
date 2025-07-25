@@ -1,1 +1,25 @@
-// Symbolic macro definitions placeholder
+# macro_library.py
+
+# Define symbolic macros for reuse and compression
+MACROS = {
+    'FIB_START': [1, 1],
+    'ADD_OP': [4],  # symbolic ADD
+    'SUB_OP': [5],  # symbolic SUB
+    'MUL_OP': [6],  # symbolic MUL (optional)
+    'PI': [2, 2, 'DIV', 7],
+    'SQRT2': [9, 9, 'DIV', 7, 0],
+    'PHI': [8, 9, 'DIV', 5, 5]
+}
+
+def expand_macros(symbolic_sequence, macros=MACROS):
+    """
+    Expand macros recursively in a symbolic sequence.
+    """
+    expanded = []
+    for item in symbolic_sequence:
+        if isinstance(item, str) and item in macros:
+            # Expand nested macros
+            expanded.extend(expand_macros(macros[item], macros))
+        else:
+            expanded.append(item)
+    return expanded
