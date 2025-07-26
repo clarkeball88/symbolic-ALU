@@ -2,3 +2,59 @@
 
 import re
 from symbolic_alu import symbolic_add, symbolic_sub, symbolic_mul, symbolic_div, symbolic_and, symbolic_xor
+
+def parse_symbolic(expr: str):
+    """Parses symbolic expression like ⟦2,2⟧ into a tuple of integers."""
+    match = re.match(r"⟦(\d+),(\d+)⟧", expr)
+    return (int(match.group(1)), int(match.group(2))) if match else None
+
+def format_symbolic(pair: tuple):
+    return f"⟦{pair[0]},{pair[1]}⟧"
+
+def evaluate(line: str):
+    # Parse and evaluate one symbolic test case line
+    line = line.strip()
+    if not line or line.startswith("#"):
+        return True, line  # Skip comments and blanks
+
+    pattern = r"(⟦\d+,\d+⟧)\s*([+\-×÷ANDXOR]+)\s*(⟦\d+,\d+⟧)\s*=\s*(⟦\d+,\d+⟧)"
+    match = re.match(pattern, line)
+
+    if not match:
+        return False, f"Malformed line: {line}"
+
+    lhs1, op, lhs2, expected = match.groups()
+    a = parse_symbolic(lhs1)
+    b = parse_symbolic(lhs2)
+    exp = parse_symbolic(expected)
+
+    if op == '+':
+        result = symbolic_add(a, b)
+    elif op == '-':
+        result = symbolic_sub(a, b)
+    elif op == '×':
+        result = symbolic_mul(a, b)
+    elif op == '÷':
+        result = symbolic_div(a, b)
+    elif op == 'AND':
+        result = symbolic_and(a, b)
+    elif op == 'XOR':
+        result = symbolic_xor(a, b)
+    else:
+        return False, f"Unknown operation: {op}"
+
+    passed = result == exp
+    return passed, f"{line} → {'PASS' if passed else f'FAIL (got {format_symbolic(result)})'}"
+
+def run_unit_tests(file_path: str = "test_cases.sum"):
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+
+    print("Running symbolic unit tests...\n")
+    for line in lines:
+        passed, result = evaluate(line)
+        print(result)
+    print("\nTest complete.")
+
+if __name__ == "__main__":
+    run_unit_tests()
